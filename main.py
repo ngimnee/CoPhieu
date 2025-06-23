@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from data_utils import load_data, append_new_data
-from model_utils import train_model, ve_bieu_do
+from model_utils import train_model
+from chart import bieu_do_so_sanh
 from ui import create_gui
 
 # Tải dữ liệu từ file và huấn luyện mô hình ban đầu
@@ -46,7 +47,7 @@ window, entries, result_label, metrics_label, plot_frame = create_gui(predict, m
 
 # Vẽ biểu đồ
 fig, ax = plt.subplots(figsize=(8, 4))
-ve_bieu_do(ax, y_test, y_pred, n=15)
+bieu_do_so_sanh(ax, y_test, y_pred, n=15)
 canvas = FigureCanvasTkAgg(fig, master=plot_frame)
 canvas.draw()
 canvas.get_tk_widget().pack()

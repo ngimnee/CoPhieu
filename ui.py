@@ -1,6 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+from model_utils import train_model
+from data_utils import load_data
+
+
+# Hàm tạo giao diện
 def create_gui(predict_callback, mae, rmse, r2):
     window = tk.Tk()
     window.title("Dự báo giá đóng cửa cổ phiếu FPT")
@@ -28,30 +35,27 @@ def create_gui(predict_callback, mae, rmse, r2):
     entries = {}  # Dictionary để lưu các Entry widget
     labels = ["Giá mở cửa", "Giá cao nhất", "Giá thấp nhất", "KL giao dịch (M)", "% Thay đổi"]
     for i, label in enumerate(labels):
-        # Tạo nhãn
         ttk.Label(form_frame, text=label + ":").grid(row=i, column=0, sticky="e", padx=10, pady=5)
-        # Tạo ô nhập
         entry = ttk.Entry(form_frame)
         entry.grid(row=i, column=1, padx=10, pady=5)
-        entries[label] = entry  # Lưu entry vào dict
+        entries[label] = entry
 
     # Label hiển thị kết quả dự đoán
     result_label = ttk.Label(form_frame, text="")
     result_label.grid(row=6, column=0, columnspan=2, pady=10)
 
-    # Label hiển thị các chỉ số đánh giá mô hình (MAE, RMSE, R²)
+    # Label hiển thị các chỉ số đánh giá mô hình
     metrics_label = ttk.Label(
         form_frame,
         text=f"MAE: {mae:.4f} | RMSE: {rmse:.4f} | R²: {r2:.4f}"
     )
     metrics_label.grid(row=7, column=0, columnspan=2, pady=5)
 
-    # Nút dự đoán: khi bấm sẽ gọi hàm predict_callback
+    # Nút dự đoán thủ công
     ttk.Button(
         form_frame,
         text="Dự đoán",
         command=predict_callback
     ).grid(row=5, column=0, columnspan=2, pady=10)
 
-    # Trả về toàn bộ các thành phần cần thiết để sử dụng trong phần chính
     return window, entries, result_label, metrics_label, plot_frame
