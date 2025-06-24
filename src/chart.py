@@ -5,7 +5,7 @@ from data_utils import load_data
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 # Hàm vẽ biểu đồ so sánh
-def bieu_do_so_sanh(ax, y_test, y_pred, n=15):
+def bieu_do_so_sanh(ax, y_test, y_pred, n=30):
     x_range = range(n)
     ax.plot(x_range, y_test[-n:], label='Giá thực tế', color='#1f77b4', linewidth=2, marker='o', markersize=4)
     ax.plot(x_range, y_pred[-n:], label='Giá dự đoán', color='#ff7f0e', linestyle='--', linewidth=2, marker='x', markersize=4)
@@ -27,18 +27,3 @@ def bieu_do_du_bao(ax, gia_du_bao):
     ax.set_ylabel("Giá đóng cửa dự đoán")
     ax.grid(True, linestyle='--', alpha=0.6)
     ax.figure.tight_layout()
-
-
-# Hàm show lại biểu đồ so sánh
-def show_bieu_do_so_sanh(plot_frame, y_test, y_pred):
-    # Xóa biểu đồ cũ trong plot_frame
-    for widget in plot_frame.winfo_children():
-        widget.destroy()
-
-    # Vẽ lại biểu đồ so sánh
-    from chart import bieu_do_so_sanh
-    fig, ax = plt.subplots(figsize=(8, 4))
-    bieu_do_so_sanh(ax, y_test, y_pred, n=15)
-    canvas = FigureCanvasTkAgg(fig, master=plot_frame)
-    canvas.draw()
-    canvas.get_tk_widget().pack()

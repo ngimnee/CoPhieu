@@ -66,11 +66,11 @@ def create_gui(predict_callback, forecast_callback, back_callback, mae, rmse, r2
     # Nút dự báo 10 ngày tới
     ttk.Button(
         button_row,
-        text="Xu hướng 10 ngày tới",
+        text="Dự đoán xu hướng",
         command=forecast_callback
     ).pack(side="left", padx=5)
 
-    # Nút xem lại biểu đồ so sánh
+    # Nút xem biểu đồ so sánh
     ttk.Button(
         button_row,
         text="Biểu đồ so sánh",
@@ -135,7 +135,7 @@ def forecast_10_days(plot_frame, model, scaler, df_data):
 
 # Hàm vẽ lại biểu đồ so sánh
 def reshow_so_sanh(plot_frame, y_test, y_pred):
-    render_chart(lambda ax: bieu_do_so_sanh(ax, y_test, y_pred, n=15), plot_frame)
+    render_chart(lambda ax: bieu_do_so_sanh(ax, y_test, y_pred, n=30), plot_frame)
 
 
 def render_chart(ax_func, plot_frame):

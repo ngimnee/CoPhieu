@@ -5,7 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from data_utils import load_data, append_new_data
 from model_utils import train_model, du_doan_xu_huong
-from chart import bieu_do_so_sanh, bieu_do_du_bao, show_bieu_do_so_sanh
+from chart import bieu_do_so_sanh, bieu_do_du_bao
 from ui_controller import create_gui, predict, forecast_10_days, reshow_so_sanh
 
 # Tải dữ liệu từ file và huấn luyện mô hình ban đầu
@@ -27,12 +27,8 @@ def update_predict():
 # Tạo GUI từ các callback
 window, entries, result_label, metrics_label, plot_frame = create_gui(predict_callback, forecast_callback, back_callback, mae, rmse, r2)
 
-# Hiển thị biểu đồ so sánh
-fig, ax = plt.subplots(figsize=(8, 4))
-bieu_do_so_sanh(ax, y_test, y_pred, n=15)
-canvas = FigureCanvasTkAgg(fig, master=plot_frame)
-canvas.draw()
-canvas.get_tk_widget().pack()
+# Hiển thị biểu đồ xu hướng
+forecast_10_days(plot_frame, model, scaler, df_data)
 
 # Chạy chương trình
 window.mainloop()
