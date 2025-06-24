@@ -5,10 +5,10 @@ Xây dựng mô hình dự đoán Xu hướng giá cổ phiếu dựa trên mô 
 Đây là một chương trình Python kết hợp GUI (tkinter) với mô hình học máy (LinearRegression) để dự báo giá đóng cửa cổ phiếu FPT dựa trên các chỉ số trong ngày.
 
 ---📁 Cấu trúc thư mục---
-├──data
+├── data
   ├── du_lieu_fpt.csv       # Dữ liệu chính (giá cổ phiếu)
   └── du_lieu_du_doan.csv   # Lưu dự đoán người dùng
-├──src
+├── src
   ├── chart.py              # Vẽ biểu đồ so sánh & xu hướng
   ├── data_utils.py         # Load dữ liệu & cập nhật CSV
   ├── model_utils.py        # Huấn luyện & dự đoán mô hình
