@@ -2,8 +2,8 @@ import pandas as pd
 import os
 from datetime import datetime
 
-DATA_FILE = "data/du_lieu_fpt.csv"
-USER_DATA_FILE = "data/du_lieu_du_doan.csv"
+DATA_FILE = "../data/du_lieu_fpt.csv"
+USER_DATA_FILE = "../data/du_lieu_du_doan.csv"
 
 # Hàm chuyển đổi chuỗi thành số, xử lý các định dạng như 'M', '%', '.', ','
 def chuyen_doi_so(chuoi):
