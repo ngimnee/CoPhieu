@@ -1,51 +1,37 @@
+'''
+    pip install pandas numpy scikit-learn matplotlib
+'''
+
 import tkinter as tk
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from data_utils import load_data, append_new_data
-from model_utils import train_model
-from chart import bieu_do_so_sanh
-from ui import create_gui
+from model_utils import train_model, du_doan_xu_huong
+from chart import bieu_do_so_sanh, bieu_do_du_bao, show_bieu_do_so_sanh
+from ui_controller import create_gui, predict, forecast_10_days, reshow_so_sanh
 
 # Tải dữ liệu từ file và huấn luyện mô hình ban đầu
 df_data = load_data()
 model, scaler, mae, rmse, r2, y_test, y_pred = train_model(df_data)
 
+# Tạo hàm callback phù hợp với giao diện GUI
+predict_callback = lambda: update_predict()
+forecast_callback = lambda: forecast_10_days(plot_frame, model, scaler, df_data)
+back_callback = lambda: reshow_so_sanh(plot_frame, y_test, y_pred)
 
-# Hàm xử lý khi người dùng nhấn nút "Dự đoán"
-def predict():
+# Sau mỗi lần nhấn nút "Dự đoán", gọi predict và cập nhật các biến toàn cục
+def update_predict():
     global model, scaler, mae, rmse, r2, y_test, y_pred, df_data
-    # Đọc dữ liệu người dùng nhập từ các ô Entry
-    try:
-        mo = float(entries["Giá mở cửa"].get())
-        cao = float(entries["Giá cao nhất"].get())
-        thap = float(entries["Giá thấp nhất"].get())
-        kl = float(entries["KL giao dịch (M)"].get()) * 1_000_000
-        pt = float(entries["% Thay đổi"].get())
+    model, scaler, mae, rmse, r2, y_test, y_pred, df_data = predict(
+        entries, result_label, metrics_label, plot_frame, model, scaler, df_data
+    )
 
-        # Tạo DataFrame từ input để đưa vào mô hình
-        data = pd.DataFrame([[mo, cao, thap, kl, pt]], columns=['Mo', 'Cao', 'Thap', 'KL', 'Phan_tram'])
-        # Chuẩn hóa dữ liệu đầu
-        data_scaled = scaler.transform(data)
-        # Dự đoán giá đóng cửa
-        ket_qua = round(model.predict(data_scaled)[0], 2)
+# Tạo GUI từ các callback
+window, entries, result_label, metrics_label, plot_frame = create_gui(predict_callback, forecast_callback, back_callback, mae, rmse, r2)
 
-        # Hiển thị và lưu kết quả
-        result_label.config(text=f"Giá đóng cửa dự đoán: {ket_qua}", foreground="blue")
-        append_new_data(mo, cao, thap, kl, pt, ket_qua)
-
-        # Cập nhật lại mô hình với dữ liệu mới
-        df_data = load_data()
-        model, scaler, mae, rmse, r2, y_test, y_pred = train_model(df_data)
-        metrics_label.config(text=f"MAE: {mae:.4f} | RMSE: {rmse:.4f} | R²: {r2:.4f}")
-    except Exception as e:
-        result_label.config(text=f"Lỗi: {e}", foreground="red")
-
-# Tạo GUI từ form
-window, entries, result_label, metrics_label, plot_frame = create_gui(predict, mae, rmse, r2)
-
-# Vẽ biểu đồ
+# Hiển thị biểu đồ so sánh
 fig, ax = plt.subplots(figsize=(8, 4))
 bieu_do_so_sanh(ax, y_test, y_pred, n=15)
 canvas = FigureCanvasTkAgg(fig, master=plot_frame)

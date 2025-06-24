@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import random
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -41,3 +42,42 @@ def train_model(df):
     r2 = r2_score(y_test, y_pred)               # Hệ số xác định (R²)
 
     return model, scaler, mae, rmse, r2, y_test.reset_index(drop=True), y_pred
+
+
+# Hàm dự báo xu hướng
+def du_doan_xu_huong(model, scaler, df_data, n=10):
+    features = ['Mo', 'Cao', 'Thap', 'KL', 'Phan_tram']
+    du_bao = []
+
+    # Lấy dòng dữ liệu cuối cùng làm khởi đầu
+    last_row = df_data.iloc[-1][features].values.reshape(1, -1)
+
+    for _ in range(n):
+        # Đảm bảo input có tên cột (tránh cảnh báo sklearn)
+        df_last = pd.DataFrame(last_row, columns=features)
+        scaled_input = scaler.transform(df_last)
+
+        # Dự đoán giá đóng cửa
+        predicted_close = model.predict(scaled_input)[0]
+
+        # Nếu 3 ngày gần nhất đều tăng → làm chậm xu hướng
+        if len(du_bao) >= 3 and du_bao[-1] > du_bao[-2] > du_bao[-3]:
+            delta = predicted_close - du_bao[-1]
+            predicted_close = du_bao[-1] + 0.5 * delta  # chỉ tăng 50%
+
+        du_bao.append(predicted_close)
+
+        # Tạo KL và % ngẫu nhiên pha trung bình
+        kl_ngau_nhien = random.choice(df_data['KL'].values[-10:])
+        pt_ngau_nhien = random.choice(df_data['Phan_tram'].values[-10:])
+        kl_trung_binh = np.mean(df_data['KL'].values[-5:])
+        pt_trung_binh = np.mean(df_data['Phan_tram'].values[-5:])
+
+        kl = 0.5 * kl_ngau_nhien + 0.5 * kl_trung_binh
+        pt = 0.5 * pt_ngau_nhien + 0.5 * pt_trung_binh
+
+        # Tạo hàng mới dùng giá dự báo cho Mo, Cao, Thap
+        new_row = [[predicted_close, predicted_close, predicted_close, kl, pt]]
+        last_row = np.array(new_row)
+
+    return du_bao
