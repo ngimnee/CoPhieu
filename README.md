@@ -4,24 +4,44 @@ Xây dựng mô hình dự đoán Xu hướng giá cổ phiếu dựa trên mô 
 
 Đây là một chương trình Python kết hợp GUI (tkinter) với mô hình học máy (LinearRegression) để dự báo giá đóng cửa cổ phiếu FPT dựa trên các chỉ số trong ngày.
 
----Các file .py---
-1. chart.py
-  - Vẽ các biểu đồ so sánh giá thực tế và giá dự đoán.
-2. data_utils.py
-  - Đọc và xử lý các file data.
-  - Làm sạch dữ liệu.
-3. model_utils.py
-  - Chia dữ liệu train - test: 80 - 20.
-  - Chuẩn hóa dữ liệu.
-  - Xây dựng mô hình.
-  - Huấn luyện mô hình.
-4. ui.py
-  - Xây dựng giao diện và các nút.
-5. main.py
-  - Xử lý kết nối các file và chạy chương trình.
+---📁 Cấu trúc thư mục---
+├──data
+  ├── du_lieu_fpt.csv       # Dữ liệu chính (giá cổ phiếu)
+  └── du_lieu_du_doan.csv   # Lưu dự đoán người dùng
+├── chart.py              # Vẽ biểu đồ so sánh & xu hướng
+├── data_utils.py         # Load dữ liệu & cập nhật CSV
+├── model_utils.py        # Huấn luyện & dự đoán mô hình
+├── ui_controller.py      # Logic xử lý GUI & biểu đồ
+├── main.py               # Khởi chạy ứng dụng
+└── README.md             # Tài liệu hướng dẫn
+
+---🚀 Cách chạy ứng dụng---
+1. Cài thư viện:
+  - pip install pandas numpy scikit-learn matplotlib
+2. Chạy ứng dụng:
+  - python main.py
+
+---🧠 Chức năng chính---
+  - Dự đoán giá đóng cửa từ thông số nhập tay (giá mở cửa, cao nhất, thấp nhất, khối lượng, phần trăm thay đổi).
+  - Tự động cập nhật file CSV sau mỗi lần dự đoán.
+  - Huấn luyện lại mô hình để cải thiện độ chính xác.
+  - Biểu đồ so sánh giá thực tế vs dự đoán.
+  - Biểu đồ xu hướng 10 ngày tiếp theo.
+  - Bộ nhớ cache biểu đồ xu hướng giúp cố định xu hướng trong mỗi phiên.
+
+---📈 Giao diện---
+  - Dự đoán thủ công với các ô nhập liệu.
+  - Nút "Xu hướng 10 ngày tới" để xem biểu đồ tự động.
+  - Nút "Biểu đồ so sánh" để quay lại đánh giá mô hình.
+
+---🛠 Kỹ thuật sử dụng---
+- LinearRegression từ Scikit-Learn
+- StandardScaler để chuẩn hóa dữ liệu
+- Tkinter cho GUI
+- Matplotlib để hiển thị biểu đồ
 
 
----Các hàm---
+---🔍 Các hàm chính---
 1. Xử lý dữ liệu: chuyen_doi_so(chuoi)
   - Đọc file data. Lấy các cột làm X đặc trưng đầu vào: giá mở cửa, cao, thấp, khối lượng, % thay đổi.
   - Chuyển đổi chuỗi thành số, xử lý các định dạng "M", "&", "," ...
@@ -46,3 +66,4 @@ Xây dựng mô hình dự đoán Xu hướng giá cổ phiếu dựa trên mô 
   - Show kết quả và các chỉ số đánh giá.
 5. Biểu đồ
   - So sánh giá thực tế và giá dự đoán trong 15 ngày gần nhất.
+  - Biểu đồ dự đoán xu hướng cổ phiếu trong 10 ngày tiếp theo.
