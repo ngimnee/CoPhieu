@@ -18,12 +18,20 @@ def bieu_do_so_sanh(ax, y_test, y_pred, n=30):
 
 
 # Hàm vẽ biểu đồ dự báo xu hướng
-def bieu_do_du_bao(ax, gia_du_bao):
-    ax.clear()
-    x_range = list(range(1, len(gia_du_bao) + 1))
-    ax.plot(x_range, gia_du_bao, marker='o', linestyle='--', color='green')
-    ax.set_title("Xu hướng giá cổ phiếu 10 ngày tới", fontsize=12)
+def bieu_do_du_bao(ax, gia_du_bao, df_data):
+    # Lấy giá đóng cửa của ngày cuối cùng từ dữ liệu lịch sử
+    last_historical_price = df_data['Dong_cua'].iloc[-1]
+    # Kết hợp điểm lịch sử và các điểm dự đoán
+    prices = [last_historical_price] + gia_du_bao
+    x_range = list(range(0, len(prices)))  # Bắt đầu từ 0 để bao gồm điểm lịch sử
+
+    # Vẽ điểm lịch sử (màu đỏ) và các điểm dự đoán (màu xanh lá)
+    ax.plot(x_range[:1], prices[:1], marker='o', color='red', label='Giá cuối ngày', markersize=6)
+    ax.plot(x_range[1:], prices[1:], marker='o', linestyle='--', color='green', label='Giá dự đoán')
+
+    ax.set_title("Xu hướng giá cổ phiếu 7 ngày tới", fontsize=12)
     ax.set_xlabel("Ngày")
-    ax.set_ylabel("Giá đóng cửa dự đoán")
+    ax.set_ylabel("Giá đóng cửa")
     ax.grid(True, linestyle='--', alpha=0.6)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
     ax.figure.tight_layout()

@@ -27,12 +27,12 @@ Xây dựng mô hình dự đoán Xu hướng giá cổ phiếu dựa trên mô 
   - Tự động cập nhật file CSV sau mỗi lần dự đoán.
   - Huấn luyện lại mô hình để cải thiện độ chính xác.
   - Biểu đồ so sánh giá thực tế vs dự đoán.
-  - Biểu đồ xu hướng 10 ngày tiếp theo.
-  - Bộ nhớ cache biểu đồ xu hướng giúp cố định xu hướng trong mỗi phiên.
+  - Biểu đồ xu hướng 7 ngày tiếp theo.
+  - Bộ nhớ cache biểu đồ xu hướng giúp cố định xu hướng trong mỗi phiên. (tạm tắt)
 
 ---📈 Giao diện---
   - Dự đoán thủ công với các ô nhập liệu.
-  - Nút "Xu hướng 10 ngày tới" để xem biểu đồ tự động.
+  - Nút "Xu hướng 7 ngày tới" để xem biểu đồ tự động.
   - Nút "Biểu đồ so sánh" để quay lại đánh giá mô hình.
 
 ---🛠 Kỹ thuật sử dụng---
@@ -56,7 +56,6 @@ Xây dựng mô hình dự đoán Xu hướng giá cổ phiếu dựa trên mô 
     + R2: độ chính xác của mô hình
 3. Dự đoán và lưu kết quả: predict()
   - Lấy giá trị từ GUI.
-  - Nhân KL với 1 000 000 để lấy giá trị thật (Đầu vào nhập là định dạng đơn vị triệu).
   - Chuẩn hóa và dự đoán bằng mô hình.
   - Hiển thị kết quả dự đoán.
   - Lưu data dự đoán vào file.
@@ -65,6 +64,20 @@ Xây dựng mô hình dự đoán Xu hướng giá cổ phiếu dựa trên mô 
   - Form nhập: mở cửa, cao nhất, thấp nhất, khối lượng, phần trăm.
   - Nút "Dự đoán" -> predict().
   - Show kết quả và các chỉ số đánh giá.
-5. Biểu đồ
+5. Dự báo xu hướng 7 ngày tới
+  - Mô phỏng xu hướng giá trong 7 ngày.
+  - Kết hợp nhiều mô hình phụ: mở cửa, cao, thấp, KL, phần trăm.
+    + Mo(t+1) -> Dong_cua(t), Phan_tram(t), KL(t)
+    + Cao(t+1) -> Mo(t+1), Dong_cua(t), Cao(t), Chenh_lech(t)
+    + Thap(t+1) -> Mo(t+1), Dong_cua(t), Thap(t), Chenh_lech(t)
+    + KL(t+1) -> Mo(t+1), Cao(t+1), Thap(t+1), KL_TB7(t)
+    + Phan_tram(t+1) -> Mo(t+1), Cao(t+1), Thap(t+1), KL(t+1)
+    + Dong_cua(t+1) -> Mo(t+1), Cao(t+1), Thap(t+1), KL(t+1), Phan_tram(t+1)
+Notes:
+    (
+        Chenh_lech(t) = Cao(t) - Thap(t),
+        KL_TB7(t) là trung bình khối lượng giao dịch 7 ngày gần nhất tại thời điểm t.
+    )
+6. Biểu đồ
   - So sánh giá thực tế và giá dự đoán trong 15 ngày gần nhất.
-  - Biểu đồ dự đoán xu hướng cổ phiếu trong 10 ngày tiếp theo.
+  - Biểu đồ dự đoán xu hướng cổ phiếu trong 7 ngày tiếp theo.
