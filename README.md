@@ -8,11 +8,12 @@ Xây dựng mô hình dự đoán Xu hướng giá cổ phiếu dựa trên mô 
 ├──data
   ├── du_lieu_fpt.csv       # Dữ liệu chính (giá cổ phiếu)
   └── du_lieu_du_doan.csv   # Lưu dự đoán người dùng
-├── chart.py              # Vẽ biểu đồ so sánh & xu hướng
-├── data_utils.py         # Load dữ liệu & cập nhật CSV
-├── model_utils.py        # Huấn luyện & dự đoán mô hình
-├── ui_controller.py      # Logic xử lý GUI & biểu đồ
-├── main.py               # Khởi chạy ứng dụng
+├──src
+  ├── chart.py              # Vẽ biểu đồ so sánh & xu hướng
+  ├── data_utils.py         # Load dữ liệu & cập nhật CSV
+  ├── model_utils.py        # Huấn luyện & dự đoán mô hình
+  ├── ui_controller.py      # Logic xử lý GUI & biểu đồ
+  └── main.py               # Khởi chạy ứng dụng
 └── README.md             # Tài liệu hướng dẫn
 
 ---🚀 Cách chạy ứng dụng---
