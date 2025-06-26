@@ -27,12 +27,12 @@ Xây dựng mô hình dự đoán Xu hướng giá cổ phiếu dựa trên mô 
   - Tự động cập nhật file CSV sau mỗi lần dự đoán.
   - Huấn luyện lại mô hình để cải thiện độ chính xác.
   - Biểu đồ so sánh giá thực tế vs dự đoán.
-  - Biểu đồ xu hướng 7 ngày tiếp theo.
+  - Biểu đồ xu hướng 5 ngày (1 tuần) tiếp theo.
   - Bộ nhớ cache biểu đồ xu hướng giúp cố định xu hướng trong mỗi phiên. (tạm tắt)
 
 ---📈 Giao diện---
   - Dự đoán thủ công với các ô nhập liệu.
-  - Nút "Xu hướng 7 ngày tới" để xem biểu đồ tự động.
+  - Nút "Dự đoán" để xem biểu đồ dự đoán xu hướng tự động.
   - Nút "Biểu đồ so sánh" để quay lại đánh giá mô hình.
 
 ---🛠 Kỹ thuật sử dụng---
@@ -64,8 +64,8 @@ Xây dựng mô hình dự đoán Xu hướng giá cổ phiếu dựa trên mô 
   - Form nhập: mở cửa, cao nhất, thấp nhất, khối lượng, phần trăm.
   - Nút "Dự đoán" -> predict().
   - Show kết quả và các chỉ số đánh giá.
-5. Dự báo xu hướng 7 ngày tới
-  - Mô phỏng xu hướng giá trong 7 ngày.
+5. Dự báo xu hướng 5 ngày tới
+  - Mô phỏng xu hướng giá trong 5 ngày.
   - Kết hợp nhiều mô hình phụ: mở cửa, cao, thấp, KL, phần trăm.
     + Mo(t+1) -> Dong_cua(t), Phan_tram(t), KL(t)
     + Cao(t+1) -> Mo(t+1), Dong_cua(t), Cao(t), Chenh_lech(t)
@@ -79,5 +79,5 @@ Notes:
         KL_TB7(t) là trung bình khối lượng giao dịch 7 ngày gần nhất tại thời điểm t.
     )
 6. Biểu đồ
-  - So sánh giá thực tế và giá dự đoán trong 15 ngày gần nhất.
-  - Biểu đồ dự đoán xu hướng cổ phiếu trong 7 ngày tiếp theo.
+  - So sánh giá thực tế và giá dự đoán trong 30 ngày gần nhất.
+  - Biểu đồ dự đoán xu hướng cổ phiếu trong 5 ngày tiếp theo.

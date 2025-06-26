@@ -138,9 +138,9 @@ def predict(entries, result_label, metrics_label, plot_frame, model, scaler, df_
         }
 
 
-def forecast_7_days(plot_frame, model, scaler, df_data):
-    print("→ Tính toán xu hướng mới...")
-    gia_du_bao = du_bao_xu_huong(df_data, n=7)
+def forecast(plot_frame, model, scaler, df_data):
+    print("→ Tính toán xu hướng...")
+    gia_du_bao = du_bao_xu_huong(df_data, n=5)
     render_chart(lambda ax: bieu_do_du_bao(ax, gia_du_bao, df_data), plot_frame)
 
 def reshow_so_sanh(plot_frame, y_test, y_pred):

@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import random
+from datetime import datetime
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -69,14 +70,18 @@ def predict(model, scaler, input_data, columns):
     input_scaled_df = pd.DataFrame(input_scaled, columns=columns)
     return model.predict(input_scaled_df)[0]
 
+
 def du_bao_xu_huong(df_data, n=7):
     if df_data.empty:
         raise ValueError("Dữ liệu đầu vào rỗng.")
 
     df = df_data.copy()
+    df['Ngay'] = pd.to_datetime(df['Ngay'], format='%d/%m/%Y')
+    df = df[df['Ngay'] < datetime.today()].copy()
+
     ket_qua = []
 
-    # Mô hình
+    # Huấn luyện mô hình
     model_mo, scaler_mo, *_ = train_mo_model(df)
     model_cao, scaler_cao, *_ = train_cao_model(df)
     model_thap, scaler_thap, *_ = train_thap_model(df)
@@ -84,40 +89,25 @@ def du_bao_xu_huong(df_data, n=7):
     model_pt, scaler_pt, *_ = train_phan_tram_model(df)
     model_dc, scaler_dc, *_ = train_dong_cua_model(df)
 
-    last_row = df.iloc[-1]
+    # Sử dụng ngày gần nhất để bắt đầu dự báo
+    last_row = df.iloc[0]
+
     mean_price = df['Dong_cua'].mean()
     std_price = df['Dong_cua'].std()
     mean_range = (df['Cao'] - df['Thap']).mean()
 
     for i in range(n):
-        chenh_lech = (df['Cao'].iloc[-5:].mean() - df['Thap'].iloc[-5:].mean()) if len(df) >= 5 else (last_row['Cao'] - last_row['Thap'])
-        kl_tb5 = df['KL'].iloc[-5:].mean() if len(df) >= 5 else last_row['KL']
-        pt_tb5 = df['Phan_tram'].iloc[-5:].mean() if len(df) >= 5 else last_row['Phan_tram']
-
+        chenh_lech = last_row['Cao'] - last_row['Thap']
         mo = predict(model_mo, scaler_mo, [last_row['Dong_cua'], last_row['Phan_tram'], last_row['KL']], ['Dong_cua', 'Phan_tram', 'KL'])
         cao = predict(model_cao, scaler_cao, [mo, last_row['Dong_cua'], last_row['Cao'], chenh_lech], ['Mo', 'Dong_cua', 'Cao', 'Chenh_lech'])
         thap = predict(model_thap, scaler_thap, [mo, last_row['Dong_cua'], last_row['Thap'], chenh_lech], ['Mo', 'Dong_cua', 'Thap', 'Chenh_lech'])
-        kl = predict(model_kl, scaler_kl, [mo, cao, thap, kl_tb5], ['Mo', 'Cao', 'Thap', 'KL_TB7'])
+        kl = predict(model_kl, scaler_kl, [mo, cao, thap, last_row['KL']], ['Mo', 'Cao', 'Thap', 'KL_TB7'])
         pt = predict(model_pt, scaler_pt, [mo, cao, thap, kl], ['Mo', 'Cao', 'Thap', 'KL'])
         dong_cua = predict(model_dc, scaler_dc, [mo, cao, thap, kl, pt], ['Mo', 'Cao', 'Thap', 'KL', 'Phan_tram'])
 
-        # Dao động tăng–giảm xen kẽ (±1.5% dạng sóng)
-        oscillation = 0.02 * np.sin(i * np.pi / 2)
-        dong_cua *= (1 + oscillation)
+        # Điều chỉnh
+        dong_cua = dieu_chinh(ket_qua, dong_cua, i, mean_price, std_price)
 
-        # Biên độ giới hạn linh hoạt
-        bien_do = 0.05
-        if ket_qua:
-            prev = ket_qua[-1]
-            dong_cua = max(min(dong_cua, prev * (1 + bien_do)), prev * (1 - bien_do))
-
-        # Làm mềm mượt hơn
-        if len(ket_qua) >= 2:
-            dong_cua = 0.6 * dong_cua + 0.3 * ket_qua[-1] + 0.1 * ket_qua[-2]
-        elif len(ket_qua) == 1:
-            dong_cua = 0.7 * dong_cua + 0.3 * ket_qua[-1]
-
-        dong_cua = min(max(dong_cua, mean_price - 2 * std_price), mean_price + 2 * std_price)
         cao = min(cao, dong_cua + mean_range)
         thap = max(thap, dong_cua - mean_range)
 
@@ -130,8 +120,41 @@ def du_bao_xu_huong(df_data, n=7):
             'Cao': cao,
             'Thap': thap,
             'KL': kl,
-            'Phan_tram': pt_tb5
+            'Phan_tram': pt
         })
-        df = pd.concat([df, pd.DataFrame([last_row])], ignore_index=True)
-
     return ket_qua
+
+def dieu_chinh(ket_qua, gia_moi, i, mean_price, std_price):
+    bien_do_ngay = 0.012  # giảm biên độ mỗi ngày
+    bien_do_giam_nhe = 0.003  # yếu tố giảm chậm hơn
+    bien_do_pha_dao = 0.006   # đảo chiều nhẹ hơn nữa
+    min_pha = 3  # số phiên để đảo chiều
+    giam_toi_da = 0.008  # nếu đang giảm, không cho giảm quá mức
+
+    # Làm trơn bằng EMA 3 ngày
+    if len(ket_qua) >= 2:
+        gia_moi = 0.65 * gia_moi + 0.25 * ket_qua[-1] + 0.1 * ket_qua[-2]
+    elif len(ket_qua) == 1:
+        gia_moi = 0.8 * gia_moi + 0.2 * ket_qua[-1]
+
+    # Giảm nhẹ theo thời gian để không tăng mạnh về sau
+    gia_moi *= 1 - bien_do_giam_nhe * (i - 1)
+
+    # Giới hạn dao động trong ngày ±1.2%
+    if ket_qua:
+        prev = ket_qua[-1]
+        gia_moi = max(min(gia_moi, prev * (1 + bien_do_ngay)), prev * (1 - giam_toi_da))
+
+    # Nếu tăng hoặc giảm liên tiếp → điều chỉnh hướng đi
+    if len(ket_qua) >= min_pha + 1:
+        deltas = [ket_qua[-k] - ket_qua[-k-1] for k in range(1, min_pha+1)]
+        if all(d < 0 for d in deltas):
+            gia_moi = max(gia_moi, ket_qua[-1] * (1 + bien_do_pha_dao))
+        elif all(d > 0 for d in deltas):
+            gia_moi = min(gia_moi, ket_qua[-1] * (1 - bien_do_pha_dao))
+
+    # Giới hạn tuyệt đối trong khoảng thống kê
+    gia_moi = min(max(gia_moi, mean_price - 2 * std_price),
+                  mean_price + 2 * std_price)
+
+    return round(gia_moi, 2)

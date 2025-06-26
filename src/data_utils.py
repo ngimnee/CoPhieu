@@ -8,6 +8,7 @@ USER_DATA_FILE = "../data/du_lieu_du_doan.csv"
 # Hàm chuyển đổi chuỗi thành số, xử lý các định dạng như 'M', '%', '.', ','
 def chuyen_doi_so(chuoi):
     if isinstance(chuoi, str):
+        # chuoi = chuoi.replace('M', '').replace('%', '').replace(',', '')
         chuoi = chuoi.replace('M', '').replace('%', '').replace('.', '').replace(',', '.')
     try:
         return float(chuoi)
@@ -26,7 +27,8 @@ def load_data():
     # Lấy các cột cần thiết từ dữ liệu
     df = df.iloc[:, [0, 1, 2, 3, 4, 5, 6]]
     # Đặt tên cột cho dữ liệu
-    df.columns = ['Ngay', 'Dong_cua', 'Mo', 'Cao', 'Thap', 'KL', 'Phan_tram']
+    df.columns = ['Ngay', 'Lan_cuoi', 'Mo', 'Cao', 'Thap', 'KL', 'Phan_tram']
+    df['Dong_cua'] = df['Lan_cuoi']
 
     # Áp dụng hàm chuyển đổi cho các cột số
     for cot in ['Dong_cua', 'Mo', 'Cao', 'Thap', 'KL', 'Phan_tram']:
@@ -35,7 +37,19 @@ def load_data():
     # Loại bỏ các hàng có giá trị thiếu
     df.dropna(inplace=True)
     # Lọc dữ liệu, chỉ giữ giá đóng cửa dưới 1000
-    df = df[df['Dong_cua'] < 1000]
+    # df = df[df['Dong_cua'] < 1000]
+    return df
+
+
+# Hàm load data từ file du_lieu_fpt
+def load_data_goc():
+    df = pd.read_csv(DATA_FILE)
+    df = df.iloc[:, [0, 1, 2, 3, 4, 5, 6]]
+    df.columns = ['Ngay', 'Lan_cuoi', 'Mo', 'Cao', 'Thap', 'KL', 'Phan_tram']
+    df['Dong_cua'] = df['Lan_cuoi']
+    for cot in ['Dong_cua', 'Mo', 'Cao', 'Thap', 'KL', 'Phan_tram']:
+        df[cot] = df[cot].apply(chuyen_doi_so)
+    df.dropna(inplace=True)
     return df
 
 
