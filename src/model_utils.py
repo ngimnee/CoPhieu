@@ -71,7 +71,7 @@ def predict(model, scaler, input_data, columns):
     return model.predict(input_scaled_df)[0]
 
 
-def du_bao_xu_huong(df_data, n=7):
+def du_bao_xu_huong(df_data, n=5):
     if df_data.empty:
         raise ValueError("Dữ liệu đầu vào rỗng.")
 
